@@ -1,3 +1,7 @@
+# Ignore setuptools package builds
 /build/
 /dist/
 /idi.egg-info/
+# Ignore vim swap files
+*.swp
+*.swo
