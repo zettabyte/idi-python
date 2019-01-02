@@ -13,7 +13,8 @@ sys_platform   = "darwin"
 mutagen = "*"
 
 [dev-packages]
-pytest     = "*"
-setuptools = "*"
-wheel      = "*"
-twine      = "*"
+pytest        = "*"
+pytest-runner = "*"
+setuptools    = "*"
+wheel         = "*"
+twine         = "*"
