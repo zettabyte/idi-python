@@ -12,9 +12,19 @@ setuptools.setup(
     description                   = "I despise iTunes (idi) is an iTunes library tool",
     long_description              = long_description,
     long_description_content_type = "text/markdown",
-    url                           = "https://github.com/zettabyte/idi-python",
+    keywords                      = "itunes music library metadata",
     packages                      = setuptools.find_packages(),
-    classifiers                   = [
+    setup_requires                = ["pytest-runner>=4.2,<5"],
+    tests_require                 = ["pytest>=4.0.2,<=5"],
+    install_requires              = ["mutagen>=1.42.0,<2"],
+    python_requires               = "~=3.7",
+    entry_points                  = { "console_scripts": ["idi = idi.commands:main"] },
+    url                           = "https://github.com/zettabyte/idi-python",
+    project_urls = {
+        "Source": "https://github.com/zettabyte/idi-pythpon/",
+        "Bugs"  : "https://github.com/zettabyte/idi-pythpon/issues",
+    },
+    classifiers = [
         "Development Status :: 1 - Planning",
         "Environment :: MacOS X",
         "Intended Audience :: End Users/Desktop",
