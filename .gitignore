@@ -2,6 +2,10 @@
 /build/
 /dist/
 /idi.egg-info/
+
 # Ignore vim swap files
 *.swp
 *.swo
+
+# Ignore pytest cache
+/.pytest_cache/
