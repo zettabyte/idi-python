@@ -3,10 +3,12 @@ import setuptools
 
 with open("README.md", "r") as readme:
     long_description = readme.read()
+with open("idi/VERSION") as v:
+    version = v.read().strip()
 
 setuptools.setup(
     name                          = "idi",
-    version                       = "0.0.1",
+    version                       = version,
     author                        = "Kendall Gifford",
     author_email                  = "zettabyte@gmail.com",
     description                   = "I despise iTunes (idi) is an iTunes library tool",
@@ -14,6 +16,7 @@ setuptools.setup(
     long_description_content_type = "text/markdown",
     keywords                      = "itunes music library metadata",
     packages                      = setuptools.find_packages(),
+    package_data                  = { "idi": ["VERSION"] },
     setup_requires                = ["pytest-runner>=4.2,<5"],
     tests_require                 = ["pytest>=4.0.2,<=5"],
     install_requires              = ["mutagen>=1.42.0,<2"],
