@@ -1,9 +1,12 @@
 # encoding: utf-8
+"""
+Base data types used for parsing and representing iTunes Library (ITL) details from exported XML file.
+"""
 from xml.etree import ElementTree as ET
 
 
 class Value:
-    """Basic data value within exported iTunes Library (ITL) XML document"""
+    """Basic data value within exported iTunes Library (ITL) XML document (scalar or composite)"""
 
     def __init__(self, e):
         if not isinstance(e, ET.Element):
@@ -14,7 +17,7 @@ class Value:
 
 
 class Scalar(Value):
-    """Basic leaf-node element value within ITL XML document; has no child elements/values"""
+    """Basic leaf-node (no children) data value within exported iTunes Library (ITL) XML document"""
 
     def __init__(self, e):
         super().__init__(e)

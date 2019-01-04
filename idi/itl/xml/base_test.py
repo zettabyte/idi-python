@@ -34,7 +34,7 @@ class TestScalar:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
-        e = ET.XML("<leaf>value</leaf>")
+        e = ET.XML("<scalar>value</scalar>")
         v = xml_base.Scalar(e) # doesn't raise
         assert v.raw is e
 
