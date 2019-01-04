@@ -10,6 +10,7 @@ from idi.itl.primitives import (
     XmlBase64Value,
     XmlBoolValue,
     XmlDateTimeValue,
+    XmlEmptyValue,
     XmlIntValue,
     XmlLeafValue,
     XmlNNIntValue,
@@ -84,12 +85,6 @@ class TestXmlBoolValue:
         with pytest.raises(ValueError):
             XmlBoolValue(e)
 
-    @pytest.mark.parametrize("v", (" ", "hello", "true", "false"))
-    def test_init__parameter_is_a_xml_bool_element__with_text_content__fails(self, v):
-        e = ET.XML("<true>{}</true>".format(v))
-        with pytest.raises(ValueError):
-            XmlBoolValue(e)
-
 
 class TestXmlDateTimeValue:
 
@@ -114,6 +109,22 @@ class TestXmlDateTimeValue:
         e = ET.XML("<date>{}</date>".format(v))
         with pytest.raises(ValueError):
             XmlDateTimeValue(e)
+
+
+class TestXmlEmptyValue:
+
+    @pytest.mark.happypath
+    @pytest.mark.parametrize("e", ("<empty/>", "<empty></empty>"))
+    def test_init__happy_path(self, e):
+        e = ET.XML(e)
+        v = XmlEmptyValue(e) # doesn't raise
+        assert v.raw is e
+
+    @pytest.mark.parametrize("e", ("<text>0</text>", "<whitepace1> </whitepace1>", "<ws2>\n</ws2>"))
+    def test_init__parameter_is_a_xml_element__with_text__fails(self, e):
+        e = ET.XML(e)
+        with pytest.raises(ValueError):
+            XmlEmptyValue(e)
 
 
 class TestXmlIntValue:

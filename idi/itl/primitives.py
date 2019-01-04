@@ -27,6 +27,15 @@ class XmlLeafValue(XmlValue):
             raise ValueError("XML element 'e' must not have any child elements")
 
 
+class XmlEmptyValue(XmlLeafValue):
+    """Basic leaf-node empty element value within ITL XML document; has no children or content"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        if e.text:
+            raise ValueError("XML element 'e' must be empty (no text content, not even whitespace)")
+
+
 class XmlBase64Value(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
@@ -43,13 +52,11 @@ class XmlBase64Value(XmlLeafValue):
             raise ValueError("Content of XML element 'e' has invalid base64-encoding")
 
 
-class XmlBoolValue(XmlLeafValue):
+class XmlBoolValue(XmlEmptyValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag not in { "true", "false" }:
             raise ValueError("XML element 'e' must be a <true/> or <false/> XML element")
-        if e.text:
-            raise ValueError("XML element 'e' must not have text content")
         self.value = bool(e.tag == "true")
 
 
