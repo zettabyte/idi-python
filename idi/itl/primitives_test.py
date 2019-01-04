@@ -188,7 +188,7 @@ class TestXmlStrValue:
         e = ET.XML("<string>Hello, world.</string>")
         assert XmlStrValue(e).value == "Hello, world."
 
-    def test_init__parameter_is_a_xml_string_elemenmt__empty_element_yields_empty_string(self):
+    def test_init__parameter_is_a_xml_string_element__empty_element_yields_empty_string(self):
         e1 = ET.XML("<string/>")
         e2 = ET.XML("<string></string>")
         assert XmlStrValue(e1).value == ""
