@@ -2,7 +2,7 @@
 from xml.etree import ElementTree as ET
 
 
-class XmlValue:
+class Value:
     """Basic data value within exported iTunes Library (ITL) XML document"""
 
     def __init__(self, e):
@@ -13,7 +13,7 @@ class XmlValue:
         self.raw = e
 
 
-class XmlLeafValue(XmlValue):
+class XmlLeafValue(Value):
     """Basic leaf-node element value within ITL XML document; has no child elements/values"""
 
     def __init__(self, e):
