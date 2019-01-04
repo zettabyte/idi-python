@@ -26,7 +26,12 @@ class TestXmlValue:
         XmlValue(e) # doesn't raise
 
     @pytest.mark.parametrize("e", ("string", 0, None, True, False, 3.14))
-    def test_init__parameter_not_an_xml_element__fails(self, e):
+    def test_init__parameter_not_a_xml_element__fails(self, e):
+        with pytest.raises(ValueError):
+            XmlValue(e)
+
+    def test_init__parameter_is_a_xml_element__with_attributes__fails(self):
+        e = ET.XML("<element one='attribute'></element>")
         with pytest.raises(ValueError):
             XmlValue(e)
 
@@ -40,11 +45,6 @@ class TestXmlBase64Value:
 
     def test_init__parameter_not_a_xml_data_element__fails(self):
         e = ET.XML("<string>SGVsbG8sIHdvcmxkLg==</string>")
-        with pytest.raises(ValueError):
-            XmlBase64Value(e)
-
-    def test_init__parameter_is_a_xml_data_element__with_attributes__fails(self):
-        e = ET.XML("<data one='attribute'>SGVsbG8sIHdvcmxkLg==</data>")
         with pytest.raises(ValueError):
             XmlBase64Value(e)
 
@@ -82,11 +82,6 @@ class TestXmlBoolValue:
         with pytest.raises(ValueError):
             XmlBoolValue(e)
 
-    def test_init__parameter_is_a_xml_bool_element__with_attributes__fails(self):
-        e = ET.XML("<true one='attribute'/>")
-        with pytest.raises(ValueError):
-            XmlBoolValue(e)
-
     def test_init__parameter_is_a_xml_bool_element__with_children__fails(self):
         e = ET.XML("<true><sub/></true>")
         with pytest.raises(ValueError):
@@ -108,11 +103,6 @@ class TestXmlDateTimeValue:
 
     def test_init__parameter_not_a_xml_date_element__fails(self):
         e = ET.XML("<integer>2010-01-02T03:04:05Z</integer>")
-        with pytest.raises(ValueError):
-            XmlDateTimeValue(e)
-
-    def test_init__parameter_is_a_xml_date_element__with_attributes__fails(self):
-        e = ET.XML("<date one='attribute'>2010-01-02T03:04:05Z</date>")
         with pytest.raises(ValueError):
             XmlDateTimeValue(e)
 
@@ -143,11 +133,6 @@ class TestXmlIntValue:
 
     def test_init__parameter_not_a_xml_integer_element__fails(self):
         e = ET.XML("<string>42</string>")
-        with pytest.raises(ValueError):
-            XmlIntValue(e)
-
-    def test_init__parameter_is_a_xml_integer_element__with_attributes__fails(self):
-        e = ET.XML("<integer one='attribute'>42</integer>")
         with pytest.raises(ValueError):
             XmlIntValue(e)
 
@@ -196,11 +181,6 @@ class TestXmlStrValue:
 
     def test_init__parameter_not_a_xml_string_element__fails(self):
         e = ET.XML("<integer>Hi</integer>")
-        with pytest.raises(ValueError):
-            XmlStrValue(e)
-
-    def test_init__parameter_is_a_xml_string_element__with_attributes__fails(self):
-        e = ET.XML("<string one='attribute'>Hi</string>")
         with pytest.raises(ValueError):
             XmlStrValue(e)
 

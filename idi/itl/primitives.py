@@ -10,7 +10,9 @@ import pytz
 class XmlValue:
     def __init__(self, e):
         if not isinstance(e, ET.Element):
-            raise ValueError("e must be a xml.etree.ElementTree.Element")
+            raise ValueError("'e' must be a xml.etree.ElementTree.Element")
+        if e.attrib:
+            raise ValueError("XML element 'e' must not have any attributes")
         self._raw = e
 
 
@@ -19,8 +21,6 @@ class XmlBase64Value(XmlValue):
         super().__init__(e)
         if e.tag != "data":
             raise ValueError("XML element 'e' must be an <data> XML element")
-        if e.attrib:
-            raise ValueError("XML element 'e' must not have any attributes")
         if len(e):
             raise ValueError("XML element 'e' must not have any child elements")
         if not e.text:
@@ -39,8 +39,6 @@ class XmlBoolValue(XmlValue):
         super().__init__(e)
         if e.tag not in { "true", "false" }:
             raise ValueError("XML element 'e' must be a <true/> or <false/> XML element")
-        if e.attrib:
-            raise ValueError("XML element 'e' must not have any attributes")
         if len(e):
             raise ValueError("XML element 'e' must not have any child elements")
         if e.text:
@@ -53,8 +51,6 @@ class XmlDateTimeValue(XmlValue):
         super().__init__(e)
         if e.tag != "date":
             raise ValueError("XML element 'e' must be a <date> XML element")
-        if e.attrib:
-            raise ValueError("XML element 'e' must not have any attributes")
         if len(e):
             raise ValueError("XML element 'e' must not have any child elements")
         if not e.text:
@@ -67,8 +63,6 @@ class XmlIntValue(XmlValue):
         super().__init__(e)
         if e.tag != "integer":
             raise ValueError("XML element 'e' must be an <integer> XML element")
-        if e.attrib:
-            raise ValueError("XML element 'e' must not have any attributes")
         if len(e):
             raise ValueError("XML element 'e' must not have any child elements")
         if not e.text:
@@ -89,8 +83,6 @@ class XmlStrValue(XmlValue):
         super().__init__(e)
         if e.tag != "string":
             raise ValueError("XML element 'e' must be a <string> XML element")
-        if e.attrib:
-            raise ValueError("XML element 'e' must not have any attributes")
         if len(e):
             raise ValueError("XML element 'e' must not have any child elements")
         self.value = e.text if e.text else ""
