@@ -14,7 +14,8 @@ from idi.itl.primitives import (
     XmlIntValue,
     XmlLeafValue,
     XmlNNIntValue,
-    XmlStrValue,
+    XmlStringValue,
+    XmlTextValue,
     XmlTimestampValue,
     XmlValue,
 )
@@ -178,23 +179,42 @@ class TestXmlNNIntValue:
             XmlNNIntValue(e)
 
 
-class TestXmlStrValue:
+class TestXmlStringValue:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
         e = ET.XML("<string>Hello, world.</string>")
-        assert XmlStrValue(e).value == "Hello, world."
+        assert XmlStringValue(e).value == "Hello, world."
 
-    def test_init__parameter_is_a_xml_string_element__empty_element_yields_empty_string(self):
-        e1 = ET.XML("<string/>")
-        e2 = ET.XML("<string></string>")
-        assert XmlStrValue(e1).value == ""
-        assert XmlStrValue(e2).value == ""
+    @pytest.mark.parametrize("e", ("<string/>", "<string></string>"))
+    def test_init__parameter_is_a_xml_string_element__empty_element_yields_empty_string(self, e):
+        e = ET.XML(e)
+        assert XmlStringValue(e).value == ""
 
     def test_init__parameter_not_a_xml_string_element__fails(self):
         e = ET.XML("<integer>Hi</integer>")
         with pytest.raises(ValueError):
-            XmlStrValue(e)
+            XmlStringValue(e)
+
+
+class TestXmlTextValue:
+
+    @pytest.mark.happypath
+    def test_init__happy_path(self):
+        e = ET.XML("<text>Hello, world.</text>")
+        assert XmlTextValue(e).value == "Hello, world."
+
+    @pytest.mark.parametrize("e", ("<empty/>", "<empty></empty>"))
+    def test_init__parameter_is_an_empty_xml_element__value_is_none(self, e):
+        e = ET.XML(e)
+        assert XmlTextValue(e).value is None
+
+    @pytest.mark.parametrize("e", ("<ws1> </ws1>", "<ws2>\n</ws2>"))
+    def test_init__parameter_is_a_whitespace_only_xml_element__value_is_string(self, e):
+        e = ET.XML(e)
+        v = XmlTextValue(e)
+        assert isinstance(v.value, str)
+        assert v.value.strip() == ""
 
 
 class TestXmlTimestampValue:

@@ -36,6 +36,14 @@ class XmlEmptyValue(XmlLeafValue):
             raise ValueError("XML element 'e' must be empty (no text content, not even whitespace)")
 
 
+class XmlTextValue(XmlLeafValue):
+    """Basic leaf-node element that may be empty or may have text content"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        self.value = e.text
+
+
 class XmlBase64Value(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
@@ -88,12 +96,13 @@ class XmlNNIntValue(XmlIntValue):
             raise ValueError("XML element 'e' must have a non-negative integral value")
 
 
-class XmlStrValue(XmlLeafValue):
+class XmlStringValue(XmlTextValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "string":
             raise ValueError("XML element 'e' must be a <string> XML element")
-        self.value = e.text if e.text else ""
+        if self.value is None:
+            self.value = ""
 
 
 class XmlTimestampValue(XmlNNIntValue):
