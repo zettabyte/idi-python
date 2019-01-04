@@ -30,16 +30,16 @@ class TestValue:
         assert v.raw is e
 
 
-class TestXmlLeafValue:
+class TestScalar:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
         e = ET.XML("<leaf>value</leaf>")
-        v = xml_base.XmlLeafValue(e) # doesn't raise
+        v = xml_base.Scalar(e) # doesn't raise
         assert v.raw is e
 
     def test_init__parameter_is_a_xml_element__with_children__fails(self):
         e = ET.XML("<parent>value<child/></parent>")
         with pytest.raises(ValueError):
-            xml_base.XmlLeafValue(e)
+            xml_base.Scalar(e)
 

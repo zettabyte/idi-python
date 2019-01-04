@@ -8,7 +8,7 @@ import pytz
 from idi.itl.xml import base as xml_base
 
 
-class XmlEmptyValue(xml_base.XmlLeafValue):
+class XmlEmptyValue(xml_base.Scalar):
     """Basic leaf-node empty element value within ITL XML document; has no children or content"""
 
     def __init__(self, e):
@@ -18,7 +18,7 @@ class XmlEmptyValue(xml_base.XmlLeafValue):
         self.value = e.tag
 
 
-class XmlTextValue(xml_base.XmlLeafValue):
+class XmlTextValue(xml_base.Scalar):
     """Basic leaf-node element that may be empty or may have text content"""
 
     def __init__(self, e):
@@ -26,7 +26,7 @@ class XmlTextValue(xml_base.XmlLeafValue):
         self.value = e.text
 
 
-class XmlScalarValue(xml_base.XmlLeafValue):
+class XmlScalarValue(xml_base.Scalar):
     """Basic leaf-node element with some non-whitespace text content; surrounding whitespace stripped"""
 
     def __init__(self, e):

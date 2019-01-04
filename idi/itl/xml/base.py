@@ -13,7 +13,7 @@ class Value:
         self.raw = e
 
 
-class XmlLeafValue(Value):
+class Scalar(Value):
     """Basic leaf-node element value within ITL XML document; has no child elements/values"""
 
     def __init__(self, e):
