@@ -34,6 +34,7 @@ class XmlEmptyValue(XmlLeafValue):
         super().__init__(e)
         if e.text:
             raise ValueError("XML element 'e' must be empty (no text content, not even whitespace)")
+        self.value = e.tag
 
 
 class XmlTextValue(XmlLeafValue):
@@ -63,9 +64,9 @@ class XmlBase64Value(XmlLeafValue):
 class XmlBoolValue(XmlEmptyValue):
     def __init__(self, e):
         super().__init__(e)
-        if e.tag not in { "true", "false" }:
+        if self.value not in { "true", "false" }:
             raise ValueError("XML element 'e' must be a <true/> or <false/> XML element")
-        self.value = bool(e.tag == "true")
+        self.value = bool(self.value == "true")
 
 
 class XmlDateTimeValue(XmlLeafValue):

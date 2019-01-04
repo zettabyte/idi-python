@@ -127,6 +127,10 @@ class TestXmlEmptyValue:
         with pytest.raises(ValueError):
             XmlEmptyValue(e)
 
+    def test_value__set_to_tag_name(self):
+        e = ET.XML("<foo/>")
+        assert XmlEmptyValue(e).value == "foo"
+
 
 class TestXmlIntValue:
 
