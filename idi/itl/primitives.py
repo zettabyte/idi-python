@@ -6,28 +6,10 @@ from xml.etree import ElementTree as ET
 
 import pytz
 
-
-class XmlValue:
-    """Basic data value within exported iTunes Library (ITL) XML document"""
-
-    def __init__(self, e):
-        if not isinstance(e, ET.Element):
-            raise ValueError("'e' must be a xml.etree.ElementTree.Element")
-        if e.attrib:
-            raise ValueError("XML element 'e' must not have any attributes")
-        self.raw = e
+from idi.itl.xml import base as xml_base
 
 
-class XmlLeafValue(XmlValue):
-    """Basic leaf-node element value within ITL XML document; has no child elements/values"""
-
-    def __init__(self, e):
-        super().__init__(e)
-        if len(e):
-            raise ValueError("XML element 'e' must not have any child elements")
-
-
-class XmlEmptyValue(XmlLeafValue):
+class XmlEmptyValue(xml_base.XmlLeafValue):
     """Basic leaf-node empty element value within ITL XML document; has no children or content"""
 
     def __init__(self, e):
@@ -37,7 +19,7 @@ class XmlEmptyValue(XmlLeafValue):
         self.value = e.tag
 
 
-class XmlTextValue(XmlLeafValue):
+class XmlTextValue(xml_base.XmlLeafValue):
     """Basic leaf-node element that may be empty or may have text content"""
 
     def __init__(self, e):
@@ -45,7 +27,7 @@ class XmlTextValue(XmlLeafValue):
         self.value = e.text
 
 
-class XmlScalarValue(XmlLeafValue):
+class XmlScalarValue(xml_base.XmlLeafValue):
     """Basic leaf-node element with some non-whitespace text content; surrounding whitespace stripped"""
 
     def __init__(self, e):
