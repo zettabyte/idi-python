@@ -8,12 +8,14 @@ import pytz
 
 
 class XmlValue:
+    """Basic data value within exported iTunes Library (ITL) XML document"""
+
     def __init__(self, e):
         if not isinstance(e, ET.Element):
             raise ValueError("'e' must be a xml.etree.ElementTree.Element")
         if e.attrib:
             raise ValueError("XML element 'e' must not have any attributes")
-        self._raw = e
+        self.raw = e
 
 
 class XmlBase64Value(XmlValue):

@@ -35,6 +35,12 @@ class TestXmlValue:
         with pytest.raises(ValueError):
             XmlValue(e)
 
+    def test_raw__holds_reference_to_original_xml_element_provided_to_init(self):
+        e = ET.XML("<foo>stuff<bar>\nmoar\n<baz/></bar>and things</foo>")
+        v = XmlValue(e)
+        assert v.raw == e
+        assert v.raw is e
+
 
 class TestXmlBase64Value:
 
