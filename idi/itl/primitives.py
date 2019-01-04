@@ -18,13 +18,20 @@ class XmlValue:
         self.raw = e
 
 
-class XmlBase64Value(XmlValue):
+class XmlLeafValue(XmlValue):
+    """Basic leaf-node element value within ITL XML document; has no child elements/values"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        if len(e):
+            raise ValueError("XML element 'e' must not have any child elements")
+
+
+class XmlBase64Value(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "data":
             raise ValueError("XML element 'e' must be an <data> XML element")
-        if len(e):
-            raise ValueError("XML element 'e' must not have any child elements")
         if not e.text:
             raise ValueError("XML element 'e' must have text content")
         data = e.text.strip()
@@ -36,37 +43,31 @@ class XmlBase64Value(XmlValue):
             raise ValueError("Content of XML element 'e' has invalid base64-encoding")
 
 
-class XmlBoolValue(XmlValue):
+class XmlBoolValue(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag not in { "true", "false" }:
             raise ValueError("XML element 'e' must be a <true/> or <false/> XML element")
-        if len(e):
-            raise ValueError("XML element 'e' must not have any child elements")
         if e.text:
             raise ValueError("XML element 'e' must not have text content")
         self.value = bool(e.tag == "true")
 
 
-class XmlDateTimeValue(XmlValue):
+class XmlDateTimeValue(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "date":
             raise ValueError("XML element 'e' must be a <date> XML element")
-        if len(e):
-            raise ValueError("XML element 'e' must not have any child elements")
         if not e.text:
             raise ValueError("XML element 'e' must have text content")
         self.value = datetime.strptime(e.text, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
 
 
-class XmlIntValue(XmlValue):
+class XmlIntValue(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "integer":
             raise ValueError("XML element 'e' must be an <integer> XML element")
-        if len(e):
-            raise ValueError("XML element 'e' must not have any child elements")
         if not e.text:
             raise ValueError("XML element 'e' must have text content")
         self.value = int(e.text)
@@ -80,13 +81,11 @@ class XmlNNIntValue(XmlIntValue):
             raise ValueError("XML element 'e' must have a non-negative integral value")
 
 
-class XmlStrValue(XmlValue):
+class XmlStrValue(XmlLeafValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "string":
             raise ValueError("XML element 'e' must be a <string> XML element")
-        if len(e):
-            raise ValueError("XML element 'e' must not have any child elements")
         self.value = e.text if e.text else ""
 
 

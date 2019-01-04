@@ -11,6 +11,7 @@ from idi.itl.primitives import (
     XmlBoolValue,
     XmlDateTimeValue,
     XmlIntValue,
+    XmlLeafValue,
     XmlNNIntValue,
     XmlStrValue,
     XmlTimestampValue,
@@ -54,11 +55,6 @@ class TestXmlBase64Value:
         with pytest.raises(ValueError):
             XmlBase64Value(e)
 
-    def test_init__parameter_is_a_xml_data_element__with_children__fails(self):
-        e = ET.XML("<data>SGVsbG8sIHdvcmxkLg==<sub/></data>")
-        with pytest.raises(ValueError):
-            XmlBase64Value(e)
-
     def test_init__parameter_is_a_xml_data_element__empty_element__fails(self):
         e = ET.XML("<data/>")
         with pytest.raises(ValueError):
@@ -88,11 +84,6 @@ class TestXmlBoolValue:
         with pytest.raises(ValueError):
             XmlBoolValue(e)
 
-    def test_init__parameter_is_a_xml_bool_element__with_children__fails(self):
-        e = ET.XML("<true><sub/></true>")
-        with pytest.raises(ValueError):
-            XmlBoolValue(e)
-
     @pytest.mark.parametrize("v", (" ", "hello", "true", "false"))
     def test_init__parameter_is_a_xml_bool_element__with_text_content__fails(self, v):
         e = ET.XML("<true>{}</true>".format(v))
@@ -109,11 +100,6 @@ class TestXmlDateTimeValue:
 
     def test_init__parameter_not_a_xml_date_element__fails(self):
         e = ET.XML("<integer>2010-01-02T03:04:05Z</integer>")
-        with pytest.raises(ValueError):
-            XmlDateTimeValue(e)
-
-    def test_init__parameter_is_a_xml_date_element__with_children__fails(self):
-        e = ET.XML("<date>2010-01-02T03:04:05Z<sub/></date>")
         with pytest.raises(ValueError):
             XmlDateTimeValue(e)
 
@@ -142,11 +128,6 @@ class TestXmlIntValue:
         with pytest.raises(ValueError):
             XmlIntValue(e)
 
-    def test_init__parameter_is_a_xml_integer_element__with_children__fails(self):
-        e = ET.XML("<integer>42<sub/></integer>")
-        with pytest.raises(ValueError):
-            XmlIntValue(e)
-
     def test_init__parameter_is_a_xml_integer_element__empty_element__fails(self):
         e = ET.XML("<integer/>")
         with pytest.raises(ValueError):
@@ -157,6 +138,20 @@ class TestXmlIntValue:
         e = ET.XML("<integer>{}</integer>".format(v))
         with pytest.raises(ValueError):
             XmlIntValue(e)
+
+
+class TestXmlLeafValue:
+
+    @pytest.mark.happypath
+    def test_init__happy_path(self):
+        e = ET.XML("<leaf>value</leaf>")
+        v = XmlLeafValue(e) # doesn't raise
+        assert v.raw is e
+
+    def test_init__parameter_is_a_xml_element__with_children__fails(self):
+        e = ET.XML("<parent>value<child/></parent>")
+        with pytest.raises(ValueError):
+            XmlLeafValue(e)
 
 
 class TestXmlNNIntValue:
@@ -187,11 +182,6 @@ class TestXmlStrValue:
 
     def test_init__parameter_not_a_xml_string_element__fails(self):
         e = ET.XML("<integer>Hi</integer>")
-        with pytest.raises(ValueError):
-            XmlStrValue(e)
-
-    def test_init__parameter_is_a_xml_string_element__with_children__fails(self):
-        e = ET.XML("<string>Hi<sub/></string>")
         with pytest.raises(ValueError):
             XmlStrValue(e)
 
