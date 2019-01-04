@@ -11,10 +11,11 @@ sys_platform   = "darwin"
 
 [packages]
 mutagen = "*"
+pytz    = "*"
 
 [dev-packages]
 pytest        = "*"
 pytest-runner = "*"
 setuptools    = "*"
-wheel         = "*"
 twine         = "*"
+wheel         = "*"
