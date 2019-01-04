@@ -45,18 +45,23 @@ class XmlTextValue(XmlLeafValue):
         self.value = e.text
 
 
-class XmlBase64Value(XmlLeafValue):
+class XmlScalarValue(XmlLeafValue):
+    """Basic leaf-node element with some non-whitespace text content; surrounding whitespace stripped"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        if not e.text or not e.text.strip():
+            raise ValueError("XML element 'e' must have some non-whitespace content")
+        self.value = e.text.strip()
+
+
+class XmlBase64Value(XmlScalarValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "data":
             raise ValueError("XML element 'e' must be an <data> XML element")
-        if not e.text:
-            raise ValueError("XML element 'e' must have text content")
-        data = e.text.strip()
-        if not data:
-            raise ValueError("XML element 'e' must have non-whitespace text content")
         try:
-            self.value = base64.b64decode(data)
+            self.value = base64.b64decode(self.value)
         except binascii.Error:
             raise ValueError("Content of XML element 'e' has invalid base64-encoding")
 
@@ -69,24 +74,27 @@ class XmlBoolValue(XmlEmptyValue):
         self.value = bool(self.value == "true")
 
 
-class XmlDateTimeValue(XmlLeafValue):
+class XmlDateTimeValue(XmlScalarValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "date":
             raise ValueError("XML element 'e' must be a <date> XML element")
-        if not e.text:
-            raise ValueError("XML element 'e' must have text content")
-        self.value = datetime.strptime(e.text, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
+        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
 
 
-class XmlIntValue(XmlLeafValue):
+class XmlIntValue(XmlScalarValue):
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "integer":
             raise ValueError("XML element 'e' must be an <integer> XML element")
-        if not e.text:
-            raise ValueError("XML element 'e' must have text content")
-        self.value = int(e.text)
+        self.value = int(self.value)
+
+
+class XmlKeyValue(XmlScalarValue):
+    def __init__(self, e):
+        super().__init__(e)
+        if e.tag != "key":
+            raise ValueError("XML element 'e' must be a <key> XML element")
 
 
 class XmlNNIntValue(XmlIntValue):
@@ -107,7 +115,7 @@ class XmlStringValue(XmlTextValue):
 
 
 class XmlTimestampValue(XmlNNIntValue):
-    """Integer representing a UNIX epoch timestamp; main value converted to said value"""
+    """Integer representing a UNIX-like timestamp based on 1900-01-01T00:00:00Z"""
     basis = datetime(1900, 1, 1, tzinfo=pytz.utc)
 
     def __init__(self, e):

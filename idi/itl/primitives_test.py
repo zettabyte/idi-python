@@ -12,8 +12,10 @@ from idi.itl.primitives import (
     XmlDateTimeValue,
     XmlEmptyValue,
     XmlIntValue,
+    XmlKeyValue,
     XmlLeafValue,
     XmlNNIntValue,
+    XmlScalarValue,
     XmlStringValue,
     XmlTextValue,
     XmlTimestampValue,
@@ -57,14 +59,8 @@ class TestXmlBase64Value:
         with pytest.raises(ValueError):
             XmlBase64Value(e)
 
-    def test_init__parameter_is_a_xml_data_element__empty_element__fails(self):
-        e = ET.XML("<data/>")
-        with pytest.raises(ValueError):
-            XmlBase64Value(e)
-
-    @pytest.mark.parametrize("v", ("", " ", " \n ", "SGVsbG8sIHdvcmxkLg"))
-    def test_init__parameter_is_a_xml_data_element__with_invalid_b64_byte_strings__fails(self, v):
-        e = ET.XML("<data>{}</data>".format(v))
+    def test_init__parameter_is_a_xml_data_element__with_invalid_base64_content__fails(self):
+        e = ET.XML("<data>SGVsbG8sIHdvcmxkLg</data>")
         with pytest.raises(ValueError):
             XmlBase64Value(e)
 
@@ -99,12 +95,7 @@ class TestXmlDateTimeValue:
         with pytest.raises(ValueError):
             XmlDateTimeValue(e)
 
-    def test_init__parameter_is_a_xml_date_element__empty_element__fails(self):
-        e = ET.XML("<date/>")
-        with pytest.raises(ValueError):
-            XmlDateTimeValue(e)
-
-    @pytest.mark.parametrize("v", ("", " ", "hello", "01/02/2010", "2010-01-02", "2010-01-02T03:04:05"))
+    @pytest.mark.parametrize("v", ("hello", "01/02/2010", "2010-01-02", "2010-01-02T03:04:05"))
     def test_init__parameter_is_a_xml_date_element__with_invalid_date_text__fails(self, v):
         # "invalid" here includes incomplete; being strict; requires exact format w/'Z' UTC timezone
         e = ET.XML("<date>{}</date>".format(v))
@@ -144,16 +135,24 @@ class TestXmlIntValue:
         with pytest.raises(ValueError):
             XmlIntValue(e)
 
-    def test_init__parameter_is_a_xml_integer_element__empty_element__fails(self):
-        e = ET.XML("<integer/>")
-        with pytest.raises(ValueError):
-            XmlIntValue(e)
-
-    @pytest.mark.parametrize("v", ("", " ", "hello", "x10", "3.14", "--42", "0xff"))
+    @pytest.mark.parametrize("v", ("hello", "x10", "3.14", "--42", "0xff"))
     def test_init__parameter_is_a_xml_integer_element__with_non_decimal_integral_text__fails(self, v):
         e = ET.XML("<integer>{}</integer>".format(v))
         with pytest.raises(ValueError):
             XmlIntValue(e)
+
+
+class TestXmlKeyValue:
+
+    @pytest.mark.happypath
+    def test_init__happy_path(self):
+        e = ET.XML("<key>Name</key>")
+        assert XmlKeyValue(e).value == "Name"
+
+    def test_init__parameter_not_a_xml_key_element__fails(self):
+        e = ET.XML("<string>Name</string>")
+        with pytest.raises(ValueError):
+            XmlKeyValue(e)
 
 
 class TestXmlLeafValue:
@@ -181,6 +180,38 @@ class TestXmlNNIntValue:
         e = ET.XML("<integer>-1</integer>")
         with pytest.raises(ValueError):
             XmlNNIntValue(e)
+
+
+class TestXmlScalarValue:
+
+    @pytest.mark.happypath
+    def test_init__happy_path(self):
+        e = ET.XML("<scalar>\n\tHello, world. \n</scalar>")
+        assert XmlScalarValue(e).value == "Hello, world."
+
+    @pytest.mark.parametrize("e", ("<scalar/>", "<scalar></scalar>"))
+    def test_init__parameter_is_an_empty_xml_element__fails(self, e):
+        e = ET.XML(e)
+        with pytest.raises(ValueError):
+            XmlScalarValue(e)
+
+    @pytest.mark.parametrize("e", ("<scalar> </scalar>", "<scalar> \n \t \t \n </scalar>"))
+    def test_init__parameter_is_an_xml_element_with_only_whitespace__fails(self, e):
+        e = ET.XML(e)
+        with pytest.raises(ValueError):
+            XmlScalarValue(e)
+
+    @pytest.mark.parametrize(("e", "expected"), (
+        ("<leading>  foo</leading>", "foo"),
+        ("<trailing>bar  </trailing>", "bar"),
+        ("<both>  baz  </both>", "baz"),
+        ("<newlines>\n0\n</newlines>", "0"),
+        ("<tabs>\t'quoted'\t</tabs>", "'quoted'"),
+        ("<all> \n\t Inner space\n \tis\t \npreserved</all>", "Inner space\n \tis\t \npreserved"),
+    ))
+    def test_value__surrounding_whitespace_is_stripped(self, e, expected):
+        e = ET.XML(e)
+        assert XmlScalarValue(e).value == expected
 
 
 class TestXmlStringValue:
