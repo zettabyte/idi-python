@@ -19,7 +19,7 @@ setuptools.setup(
     package_data                  = { "idi": ["VERSION"] },
     setup_requires                = ["pytest-runner>=4.2,<5"],
     tests_require                 = ["pytest>=4.0.2,<=5"],
-    install_requires              = ["mutagen>=1.42.0,<2"],
+    install_requires              = ["mutagen>=1.42.0,<2", "pytz"],
     python_requires               = "~=3.7",
     entry_points                  = { "console_scripts": ["idi = idi.commands:main"] },
     url                           = "https://github.com/zettabyte/idi-python",
