@@ -1,6 +1,10 @@
 # encoding: utf-8
 """
 Base data types used for parsing and representing iTunes Library (ITL) details from exported XML file.
+
+Even though another sibling module, 'scalar', may seem more appropriate for the 'Scalar' class
+contained within this module, this 'Scalar' class is a base-class (though not enforcing it as
+a pure ABC) while the 'scalar' module holds concrete types.
 """
 from xml.etree import ElementTree as ET
 
