@@ -1,12 +1,11 @@
 # encoding: utf-8
-import base64
-from datetime import datetime, timedelta
+from datetime import datetime
 from xml.etree import ElementTree as ET
 
 import pytest
 import pytz
 
-from idi.itl.primitives import (
+from idi.itl.xml.scalar import (
     XmlBase64Value,
     XmlBooleanValue,
     XmlDateTimeValue,

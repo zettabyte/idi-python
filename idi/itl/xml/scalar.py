@@ -2,7 +2,6 @@
 import base64
 import binascii
 from datetime import datetime, timedelta
-from xml.etree import ElementTree as ET
 
 import pytz
 
