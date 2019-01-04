@@ -8,13 +8,13 @@ import pytz
 
 from idi.itl.primitives import (
     XmlBase64Value,
-    XmlBoolValue,
+    XmlBooleanValue,
     XmlDateTimeValue,
     XmlEmptyValue,
-    XmlIntValue,
+    XmlIntegerValue,
     XmlKeyValue,
     XmlLeafValue,
-    XmlNNIntValue,
+    XmlNonNegativeValue,
     XmlScalarValue,
     XmlStringValue,
     XmlTextValue,
@@ -65,22 +65,22 @@ class TestXmlBase64Value:
             XmlBase64Value(e)
 
 
-class TestXmlBoolValue:
+class TestXmlBooleanValue:
 
     @pytest.mark.happypath
     def test_init__true__happy_path(self):
         e = ET.XML("<true/>")
-        assert XmlBoolValue(e).value is True
+        assert XmlBooleanValue(e).value is True
 
     @pytest.mark.happypath
     def test_init__false__happy_path(self):
         e = ET.XML("<false/>")
-        assert XmlBoolValue(e).value is False
+        assert XmlBooleanValue(e).value is False
 
     def test_init__parameter_not_a_xml_bool_element__fails(self):
         e = ET.XML("<foo/>")
         with pytest.raises(ValueError):
-            XmlBoolValue(e)
+            XmlBooleanValue(e)
 
 
 class TestXmlDateTimeValue:
@@ -123,23 +123,23 @@ class TestXmlEmptyValue:
         assert XmlEmptyValue(e).value == "foo"
 
 
-class TestXmlIntValue:
+class TestXmlIntegerValue:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
         e = ET.XML("<integer>42</integer>")
-        assert XmlIntValue(e).value == 42
+        assert XmlIntegerValue(e).value == 42
 
     def test_init__parameter_not_a_xml_integer_element__fails(self):
         e = ET.XML("<string>42</string>")
         with pytest.raises(ValueError):
-            XmlIntValue(e)
+            XmlIntegerValue(e)
 
     @pytest.mark.parametrize("v", ("hello", "x10", "3.14", "--42", "0xff"))
     def test_init__parameter_is_a_xml_integer_element__with_non_decimal_integral_text__fails(self, v):
         e = ET.XML("<integer>{}</integer>".format(v))
         with pytest.raises(ValueError):
-            XmlIntValue(e)
+            XmlIntegerValue(e)
 
 
 class TestXmlKeyValue:
@@ -169,17 +169,17 @@ class TestXmlLeafValue:
             XmlLeafValue(e)
 
 
-class TestXmlNNIntValue:
+class TestXmlNonNegativeValue:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
         e = ET.XML("<integer>0</integer>")
-        assert XmlNNIntValue(e).value == 0
+        assert XmlNonNegativeValue(e).value == 0
 
     def test_init__parameter_is_a_xml_integer_element__with_negative_value__fails(self):
         e = ET.XML("<integer>-1</integer>")
         with pytest.raises(ValueError):
-            XmlNNIntValue(e)
+            XmlNonNegativeValue(e)
 
 
 class TestXmlScalarValue:

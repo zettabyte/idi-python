@@ -56,6 +56,8 @@ class XmlScalarValue(XmlLeafValue):
 
 
 class XmlBase64Value(XmlScalarValue):
+    """Basic leaf-node element with base64-encoded data text content"""
+
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "data":
@@ -66,7 +68,9 @@ class XmlBase64Value(XmlScalarValue):
             raise ValueError("Content of XML element 'e' has invalid base64-encoding")
 
 
-class XmlBoolValue(XmlEmptyValue):
+class XmlBooleanValue(XmlEmptyValue):
+    """Basic leaf-node empty <true/> or <false/> element"""
+
     def __init__(self, e):
         super().__init__(e)
         if self.value not in { "true", "false" }:
@@ -75,6 +79,8 @@ class XmlBoolValue(XmlEmptyValue):
 
 
 class XmlDateTimeValue(XmlScalarValue):
+    """Basic leaf-node element w/a single YYYY-MM-DDTHH:MM:SSZ formated UTC date/time value"""
+
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "date":
@@ -82,7 +88,9 @@ class XmlDateTimeValue(XmlScalarValue):
         self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
 
 
-class XmlIntValue(XmlScalarValue):
+class XmlIntegerValue(XmlScalarValue):
+    """Basic leaf-node element with a single decimal-encoded integer"""
+
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "integer":
@@ -91,14 +99,17 @@ class XmlIntValue(XmlScalarValue):
 
 
 class XmlKeyValue(XmlScalarValue):
+    """Basic leaf-node element with a non-empty/non-whitespace-only textual key-name value"""
+
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "key":
             raise ValueError("XML element 'e' must be a <key> XML element")
 
 
-class XmlNNIntValue(XmlIntValue):
-    """Non-Negative (>= 0) Integer Value"""
+class XmlNonNegativeValue(XmlIntegerValue):
+    """Basic leaf-node element with a single non-negative (>= 0) decimal-encoded integer"""
+
     def __init__(self, e):
         super().__init__(e)
         if self.value < 0:
@@ -106,6 +117,8 @@ class XmlNNIntValue(XmlIntValue):
 
 
 class XmlStringValue(XmlTextValue):
+    """Basic leaf-node element with some possibly empty or whitespace-only text"""
+
     def __init__(self, e):
         super().__init__(e)
         if e.tag != "string":
@@ -114,8 +127,8 @@ class XmlStringValue(XmlTextValue):
             self.value = ""
 
 
-class XmlTimestampValue(XmlNNIntValue):
-    """Integer representing a UNIX-like timestamp based on 1900-01-01T00:00:00Z"""
+class XmlTimestampValue(XmlNonNegativeValue):
+    """Basic leaf-node element with a deciman-encoded integer representing a UNIX-like timestamp"""
     basis = datetime(1900, 1, 1, tzinfo=pytz.utc)
 
     def __init__(self, e):
