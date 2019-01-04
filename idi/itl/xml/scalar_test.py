@@ -64,24 +64,24 @@ class TestXmlDateTimeValue:
             xml_scalar.XmlDateTimeValue(e)
 
 
-class TestXmlEmptyValue:
+class TestScalarEmpty:
 
     @pytest.mark.happypath
     @pytest.mark.parametrize("e", ("<empty/>", "<empty></empty>"))
     def test_init__happy_path(self, e):
         e = ET.XML(e)
-        v = xml_scalar.XmlEmptyValue(e) # doesn't raise
+        v = xml_scalar.ScalarEmpty(e) # doesn't raise
         assert v.raw is e
 
     @pytest.mark.parametrize("e", ("<text>0</text>", "<whitepace1> </whitepace1>", "<ws2>\n</ws2>"))
     def test_init__parameter_is_a_xml_element__with_text__fails(self, e):
         e = ET.XML(e)
         with pytest.raises(ValueError):
-            xml_scalar.XmlEmptyValue(e)
+            xml_scalar.ScalarEmpty(e)
 
     def test_value__set_to_tag_name(self):
         e = ET.XML("<foo/>")
-        assert xml_scalar.XmlEmptyValue(e).value == "foo"
+        assert xml_scalar.ScalarEmpty(e).value == "foo"
 
 
 class TestXmlIntegerValue:
@@ -129,24 +129,24 @@ class TestXmlNonNegativeValue:
             xml_scalar.XmlNonNegativeValue(e)
 
 
-class TestXmlScalarValue:
+class TestScalarValue:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
         e = ET.XML("<scalar>\n\tHello, world. \n</scalar>")
-        assert xml_scalar.XmlScalarValue(e).value == "Hello, world."
+        assert xml_scalar.ScalarValue(e).value == "Hello, world."
 
     @pytest.mark.parametrize("e", ("<scalar/>", "<scalar></scalar>"))
     def test_init__parameter_is_an_empty_xml_element__fails(self, e):
         e = ET.XML(e)
         with pytest.raises(ValueError):
-            xml_scalar.XmlScalarValue(e)
+            xml_scalar.ScalarValue(e)
 
     @pytest.mark.parametrize("e", ("<scalar> </scalar>", "<scalar> \n \t \t \n </scalar>"))
     def test_init__parameter_is_an_xml_element_with_only_whitespace__fails(self, e):
         e = ET.XML(e)
         with pytest.raises(ValueError):
-            xml_scalar.XmlScalarValue(e)
+            xml_scalar.ScalarValue(e)
 
     @pytest.mark.parametrize(("e", "expected"), (
         ("<leading>  foo</leading>", "foo"),
@@ -158,7 +158,7 @@ class TestXmlScalarValue:
     ))
     def test_value__surrounding_whitespace_is_stripped(self, e, expected):
         e = ET.XML(e)
-        assert xml_scalar.XmlScalarValue(e).value == expected
+        assert xml_scalar.ScalarValue(e).value == expected
 
 
 class TestXmlStringValue:
@@ -179,24 +179,27 @@ class TestXmlStringValue:
             xml_scalar.XmlStringValue(e)
 
 
-class TestXmlTextValue:
+class TestScalarRaw:
 
     @pytest.mark.happypath
     def test_init__happy_path(self):
         e = ET.XML("<text>Hello, world.</text>")
-        assert xml_scalar.XmlTextValue(e).value == "Hello, world."
+        assert xml_scalar.ScalarRaw(e).value == "Hello, world."
 
     @pytest.mark.parametrize("e", ("<empty/>", "<empty></empty>"))
     def test_init__parameter_is_an_empty_xml_element__value_is_none(self, e):
         e = ET.XML(e)
-        assert xml_scalar.XmlTextValue(e).value is None
+        assert xml_scalar.ScalarRaw(e).value is None
 
-    @pytest.mark.parametrize("e", ("<ws1> </ws1>", "<ws2>\n</ws2>"))
-    def test_init__parameter_is_a_whitespace_only_xml_element__value_is_string(self, e):
+    @pytest.mark.parametrize(("e", "expected"), (
+        ("<ws1> </ws1>", " "),
+        ("<ws2>\n</ws2>", "\n"),
+    ))
+    def test_init__parameter_is_a_xml_element_with_only_whitespace__value_is_string(self, e, expected):
         e = ET.XML(e)
-        v = xml_scalar.XmlTextValue(e)
+        v = xml_scalar.ScalarRaw(e)
         assert isinstance(v.value, str)
-        assert v.value.strip() == ""
+        assert v.value == expected
 
 
 class TestXmlTimestampValue:

@@ -1,4 +1,7 @@
 # encoding: utf-8
+"""
+Scalar data types used for parsing and representing iTunes Library (ITL) details from exported XML file.
+"""
 import base64
 import binascii
 from datetime import datetime, timedelta
@@ -8,8 +11,8 @@ import pytz
 from idi.itl.xml import base as xml_base
 
 
-class XmlEmptyValue(xml_base.Scalar):
-    """Basic leaf-node empty element value within ITL XML document; has no children or content"""
+class ScalarEmpty(xml_base.Scalar):
+    """Basic empty (no text) scalar value (no children) whose 'value' is the underlying XML tag's name"""
 
     def __init__(self, e):
         super().__init__(e)
@@ -18,16 +21,16 @@ class XmlEmptyValue(xml_base.Scalar):
         self.value = e.tag
 
 
-class XmlTextValue(xml_base.Scalar):
-    """Basic leaf-node element that may be empty or may have text content"""
+class ScalarRaw(xml_base.Scalar):
+    """Basic text-only scalar value (no children) whose 'value' is the XML element's raw text content"""
 
     def __init__(self, e):
         super().__init__(e)
         self.value = e.text
 
 
-class XmlScalarValue(xml_base.Scalar):
-    """Basic leaf-node element with some non-whitespace text content; surrounding whitespace stripped"""
+class ScalarValue(xml_base.Scalar):
+    """Basic text-only scalar value (no children) that must have some non-whitespace content"""
 
     def __init__(self, e):
         super().__init__(e)
@@ -36,7 +39,7 @@ class XmlScalarValue(xml_base.Scalar):
         self.value = e.text.strip()
 
 
-class XmlBase64Value(XmlScalarValue):
+class XmlBase64Value(ScalarValue):
     """Basic leaf-node element with base64-encoded data text content"""
 
     def __init__(self, e):
@@ -49,7 +52,7 @@ class XmlBase64Value(XmlScalarValue):
             raise ValueError("Content of XML element 'e' has invalid base64-encoding")
 
 
-class XmlBooleanValue(XmlEmptyValue):
+class XmlBooleanValue(ScalarEmpty):
     """Basic leaf-node empty <true/> or <false/> element"""
 
     def __init__(self, e):
@@ -59,7 +62,7 @@ class XmlBooleanValue(XmlEmptyValue):
         self.value = bool(self.value == "true")
 
 
-class XmlDateTimeValue(XmlScalarValue):
+class XmlDateTimeValue(ScalarValue):
     """Basic leaf-node element w/a single YYYY-MM-DDTHH:MM:SSZ formated UTC date/time value"""
 
     def __init__(self, e):
@@ -69,7 +72,7 @@ class XmlDateTimeValue(XmlScalarValue):
         self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
 
 
-class XmlIntegerValue(XmlScalarValue):
+class XmlIntegerValue(ScalarValue):
     """Basic leaf-node element with a single decimal-encoded integer"""
 
     def __init__(self, e):
@@ -79,7 +82,7 @@ class XmlIntegerValue(XmlScalarValue):
         self.value = int(self.value)
 
 
-class XmlKeyValue(XmlScalarValue):
+class XmlKeyValue(ScalarValue):
     """Basic leaf-node element with a non-empty/non-whitespace-only textual key-name value"""
 
     def __init__(self, e):
@@ -97,7 +100,7 @@ class XmlNonNegativeValue(XmlIntegerValue):
             raise ValueError("XML element 'e' must have a non-negative integral value")
 
 
-class XmlStringValue(XmlTextValue):
+class XmlStringValue(ScalarRaw):
     """Basic leaf-node element with some possibly empty or whitespace-only text"""
 
     def __init__(self, e):
