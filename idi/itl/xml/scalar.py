@@ -21,12 +21,33 @@ class ScalarEmpty(xml_base.Scalar):
         self.value = e.tag
 
 
+class Boolean(ScalarEmpty):
+    """Basic empty (no text) scalar value (no children) that can be <true/> or <false/>"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        if self.value not in ("true", "false"):
+            raise ValueError("XML element 'e' must be a <true/> or <false/> XML element")
+        self.value = bool(self.value == "true")
+
+
 class ScalarRaw(xml_base.Scalar):
     """Basic text-only scalar value (no children) whose 'value' is the XML element's raw text content"""
 
     def __init__(self, e):
         super().__init__(e)
         self.value = e.text
+
+
+class String(ScalarRaw):
+    """Basic scalar (no children) element with some possibly empty or whitespace-only text"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        if e.tag != "string":
+            raise ValueError("XML element 'e' must be a <string> XML element")
+        if self.value is None:
+            self.value = ""
 
 
 class ScalarValue(xml_base.Scalar):
@@ -39,8 +60,8 @@ class ScalarValue(xml_base.Scalar):
         self.value = e.text.strip()
 
 
-class XmlBase64Value(ScalarValue):
-    """Basic leaf-node element with base64-encoded data text content"""
+class Base64(ScalarValue):
+    """Basic scalar (no children) having base64-encoded data text content"""
 
     def __init__(self, e):
         super().__init__(e)
@@ -52,18 +73,8 @@ class XmlBase64Value(ScalarValue):
             raise ValueError("Content of XML element 'e' has invalid base64-encoding")
 
 
-class XmlBooleanValue(ScalarEmpty):
-    """Basic leaf-node empty <true/> or <false/> element"""
-
-    def __init__(self, e):
-        super().__init__(e)
-        if self.value not in { "true", "false" }:
-            raise ValueError("XML element 'e' must be a <true/> or <false/> XML element")
-        self.value = bool(self.value == "true")
-
-
-class XmlDateTimeValue(ScalarValue):
-    """Basic leaf-node element w/a single YYYY-MM-DDTHH:MM:SSZ formated UTC date/time value"""
+class DateTime(ScalarValue):
+    """Basic scalar (no children) having a single YYYY-MM-DDTHH:MM:SSZ formated UTC date/time value"""
 
     def __init__(self, e):
         super().__init__(e)
@@ -72,8 +83,8 @@ class XmlDateTimeValue(ScalarValue):
         self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
 
 
-class XmlIntegerValue(ScalarValue):
-    """Basic leaf-node element with a single decimal-encoded integer"""
+class Integer(ScalarValue):
+    """Basic scalar (no children) having a single decimal-encoded integer"""
 
     def __init__(self, e):
         super().__init__(e)
@@ -82,17 +93,8 @@ class XmlIntegerValue(ScalarValue):
         self.value = int(self.value)
 
 
-class XmlKeyValue(ScalarValue):
-    """Basic leaf-node element with a non-empty/non-whitespace-only textual key-name value"""
-
-    def __init__(self, e):
-        super().__init__(e)
-        if e.tag != "key":
-            raise ValueError("XML element 'e' must be a <key> XML element")
-
-
-class XmlNonNegativeValue(XmlIntegerValue):
-    """Basic leaf-node element with a single non-negative (>= 0) decimal-encoded integer"""
+class NonNegativeInteger(Integer):
+    """Basic scalar (no children) having a single decimal-encoded integer that can't be negative"""
 
     def __init__(self, e):
         super().__init__(e)
@@ -100,23 +102,21 @@ class XmlNonNegativeValue(XmlIntegerValue):
             raise ValueError("XML element 'e' must have a non-negative integral value")
 
 
-class XmlStringValue(ScalarRaw):
-    """Basic leaf-node element with some possibly empty or whitespace-only text"""
-
-    def __init__(self, e):
-        super().__init__(e)
-        if e.tag != "string":
-            raise ValueError("XML element 'e' must be a <string> XML element")
-        if self.value is None:
-            self.value = ""
-
-
-class XmlTimestampValue(XmlNonNegativeValue):
-    """Basic leaf-node element with a deciman-encoded integer representing a UNIX-like timestamp"""
+class Timestamp(NonNegativeInteger):
+    """Basic scalar (no children) integer that's a UNIX-like timestamp based on 1900-01-01T00:00:00Z"""
     basis = datetime(1900, 1, 1, tzinfo=pytz.utc)
 
     def __init__(self, e):
         super().__init__(e)
         self.timestamp = self.value
         self.value     = self.basis + timedelta(seconds=self.timestamp)
+
+
+class Key(ScalarValue):
+    """Basic scalar (no children) element with a non-empty/non-whitespace-only textual key-name value"""
+
+    def __init__(self, e):
+        super().__init__(e)
+        if e.tag != "key":
+            raise ValueError("XML element 'e' must be a <key> XML element")
 
