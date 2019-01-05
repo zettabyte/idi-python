@@ -10,20 +10,37 @@ from idi.itl.xml import composite as xml_composite, scalar as xml_scalar
 
 TEST_SCHEMA = {
     "Name": {
-        "string": (xml_scalar.String, { "Album", "Movie" }),
+        "types"     : { "string": xml_scalar.String },
+        "categories": {
+            "Album"    : True,
+            "Movie"    : True,
+            "TV Show"  : True,
+            "Audiobook": True,
+            "Podcast"  : True,
+        },
     },
     "Artist": {
-        "string": (xml_scalar.String, { "Album" }),
+        "types"     : { "string": xml_scalar.String },
+        "categories": { "Album": True },
     },
     "Director": {
-        "string": (xml_scalar.String, { "Movie" }),
+        "types"     : { "string": xml_scalar.String },
+        "categories": { "Movie": False },
     },
     "Track Number": {
-        "integer": (xml_scalar.Integer, { "Album" }),
+        "types"     : { "integer": xml_scalar.Integer },
+        "categories": { "Album": False },
     },
     "Release Date": {
-        "date"   : (xml_scalar.DateTime,  { "Album", "Movie", "Book" }),
-        "integer": (xml_scalar.Timestamp, { "Album", "Movie", "Book" }),
+        "types": {
+            "date"   : xml_scalar.DateTime,
+            "integer": xml_scalar.Timestamp,
+        },
+        "categories": {
+            "Album": True,
+            "Movie": True,
+            "Book" : True,
+        },
     },
 }
 

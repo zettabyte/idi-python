@@ -48,13 +48,14 @@ class Dictionary(Value):
     def __load_field(self, name, e, possible_categories):
         if name not in self.schema:
             raise ValueError("Unknown child XML element found (name '{}' not in schema)".format(name))
-        if e.tag not in self.schema[name]:
+        if e.tag not in self.schema[name]["types"]:
             raise ValueError("Child element with name '{}' has invalid tag '{}'".format(name, e.tag))
-        klass, categories = self.schema[name][e.tag]
+        klass      = self.schema[name]["types"][e.tag]
+        categories = self.schema[name]["categories"]
         if possible_categories is None:
-            possible_categories = categories
+            possible_categories = set(categories.keys())
         else:
-            possible_categories = possible_categories & categories
+            possible_categories = possible_categories & set(categories.keys())
         if not possible_categories:
             raise ValueError("Combination of child element key/values invalid")
         return klass(e), possible_categories
