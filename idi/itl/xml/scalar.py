@@ -1,6 +1,23 @@
 # encoding: utf-8
 """
 Scalar data types used for parsing and representing iTunes Library (ITL) details from exported XML file.
+
+Part of the following class hierarchy:
+  Value    (in idi.itl.xml.base)
+    Scalar (in idi.itl.xml.base)
+      ScalarEmpty
+        Boolean
+      ScalarRaw
+        String
+      ScalarValue
+        Base64
+        DateTime
+        Integer
+          NonNegativeInteger
+            Timestamp
+        Key
+    Object (in idi.itl.xml.composite)
+    Array  (in idi.itl.xml.composite)
 """
 import base64
 import binascii
