@@ -1,5 +1,5 @@
 # encoding: utf-8
-from idi.itl import schema as default_schema
+from idi.itl.xml import schema as default_schema
 from idi.itl.xml.base import Value
 from idi.itl.xml.scalar import Key
 
